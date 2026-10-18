@@ -7,7 +7,16 @@ import Carbon.HIToolbox
 
 // MARK: - 常量
 
-let kAppName = "输入法轮换"
+/// 界面文案统一走 Localizable.strings，跟随系统语言
+func L(_ key: String) -> String {
+    NSLocalizedString(key, comment: "")
+}
+
+func L(_ key: String, _ args: CVarArg...) -> String {
+    String(format: NSLocalizedString(key, comment: ""), arguments: args)
+}
+
+var kAppName: String { L("app.name") }
 let kVersion = "1.2"
 let kLoginLabel = "com.weiqi.switchime"
 let kDefaultHotkey = 0
@@ -185,6 +194,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // 首次运行时重建一次 LaunchAgent，保证路径与当前 App 位置一致
         if LoginItem.isEnabled { LoginItem.set(true) }
 
+        if CommandLine.arguments.contains("--show-menu") { showMenuForScreenshot() }
+
         if selfTestMode {
             NSLog("SwitchIME: self-test starting")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in self?.runSelfTest() }
@@ -222,7 +233,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         // 列表里的标签做过重名消解，优先用它
         let label = sources.first(where: { $0.id == cur.id })?.label ?? cur.label
         statusItem.button?.title = label
-        statusItem.button?.toolTip = "当前输入法：\(cur.name)\n点击选择 / 快捷键切换"
+        statusItem.button?.toolTip = L("status.tooltip", cur.name)
     }
 
     /// 按 id 切换。输入源可能在菜单打开后被删除，所以每次都重新解析，
@@ -258,9 +269,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func showSecureInputWarning() {
         let alert = NSAlert()
-        alert.messageText = "当前有程序启用了「安全键盘输入」"
-        alert.informativeText = "密码框等安全输入状态下，macOS 会屏蔽所有输入法切换（系统的 Fn 键也同样无效）。点开密码框后重试即可。"
-        alert.addButton(withTitle: "好")
+        alert.messageText = L("alert.secure.title")
+        alert.informativeText = L("alert.secure.body")
+        alert.addButton(withTitle: L("alert.ok"))
         alert.runModal()
     }
 
@@ -279,13 +290,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         hotkeyRegistered = ok
         if !ok && reportFailure && !selfTestMode {
             let alert = NSAlert()
-            alert.messageText = "快捷键 \(preset.title) 注册失败"
-            alert.informativeText = "可能已被其他程序占用。请在菜单栏图标的「快捷键」里换一个组合。"
-            alert.addButton(withTitle: "好")
+            alert.messageText = L("alert.hotkey.title", preset.title)
+            alert.informativeText = L("alert.hotkey.body")
+            alert.addButton(withTitle: L("alert.ok"))
             alert.runModal()
         }
     }
 
+
+    // MARK: 截图辅助（--show-menu，仅开发时用来拍 README 图）
+
+    /// 把菜单弹出来停留 5 秒，方便外部用 screencapture 抓图
+    private func showMenuForScreenshot() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+            guard let self = self, let button = self.statusItem.button else { return }
+            self.refreshSources()
+            self.syncCurrentSource()
+            self.rebuildMenu()
+
+            // 菜单跟踪期间主队列不跑，必须用 Timer + .common 模式才能取消
+            let closer = Timer(timeInterval: 5, repeats: false) { [weak self] _ in
+                self?.menu.cancelTracking()
+            }
+            RunLoop.main.add(closer, forMode: .common)
+
+            self.menu.popUp(positioning: nil,
+                            at: NSPoint(x: 0, y: button.bounds.height + 6),
+                            in: button)
+            NSApp.terminate(nil)
+        }
+    }
 
     // MARK: 自检（--self-test，仅供构建后验证使用）
 
@@ -367,26 +401,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.removeAllItems()
 
         let curID = current?.id ?? TIS.current()?.id
-        let curName = sources.first(where: { $0.id == curID })?.name ?? current?.name ?? "未知"
-        let header = NSMenuItem(title: "当前：\(curName)", action: nil, keyEquivalent: "")
+        let curName = sources.first(where: { $0.id == curID })?.name ?? current?.name ?? L("menu.unknown")
+        let header = NSMenuItem(title: L("menu.current", curName), action: nil, keyEquivalent: "")
         header.isEnabled = false
         menu.addItem(header)
 
         menu.addItem(.separator())
 
         let hotkeyTitle = kHotkeyPresets[hotkeyIndex].title
-        let nextItem = NSMenuItem(title: "下一个输入法", action: #selector(nextAction), keyEquivalent: "")
+        let nextItem = NSMenuItem(title: L("menu.next"), action: #selector(nextAction), keyEquivalent: "")
         nextItem.target = self
-        nextItem.toolTip = "顺序轮换，快捷键 \(hotkeyTitle)"
+        nextItem.toolTip = L("menu.next.tip", hotkeyTitle)
         menu.addItem(nextItem)
 
-        let prevItem = NSMenuItem(title: "上一个输入法", action: #selector(prevAction), keyEquivalent: "")
+        let prevItem = NSMenuItem(title: L("menu.prev"), action: #selector(prevAction), keyEquivalent: "")
         prevItem.target = self
         menu.addItem(prevItem)
 
         menu.addItem(.separator())
 
-        let listHeader = NSMenuItem(title: "所有输入法", action: nil, keyEquivalent: "")
+        let listHeader = NSMenuItem(title: L("menu.all"), action: nil, keyEquivalent: "")
         listHeader.isEnabled = false
         menu.addItem(listHeader)
 
@@ -409,22 +443,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             item.state = (i == hotkeyIndex) ? .on : .off
             hotkeyMenu.addItem(item)
         }
-        let hotkeyParent = NSMenuItem(title: "快捷键", action: nil, keyEquivalent: "")
+        let hotkeyParent = NSMenuItem(title: L("menu.hotkey"), action: nil, keyEquivalent: "")
         hotkeyParent.submenu = hotkeyMenu
         menu.addItem(hotkeyParent)
 
-        let loginItem = NSMenuItem(title: "登录时自动启动", action: #selector(toggleLoginItemAction), keyEquivalent: "")
+        let loginItem = NSMenuItem(title: L("menu.login"), action: #selector(toggleLoginItemAction), keyEquivalent: "")
         loginItem.target = self
         loginItem.state = LoginItem.isEnabled ? .on : .off
         menu.addItem(loginItem)
 
         menu.addItem(.separator())
 
-        let about = NSMenuItem(title: "关于\(kAppName)", action: #selector(showAboutAction), keyEquivalent: "")
+        let about = NSMenuItem(title: L("menu.about", kAppName), action: #selector(showAboutAction), keyEquivalent: "")
         about.target = self
         menu.addItem(about)
 
-        let quit = NSMenuItem(title: "退出", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let quit = NSMenuItem(title: L("menu.quit"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quit)
     }
 
@@ -451,16 +485,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func showAboutAction() {
         let alert = NSAlert()
         alert.messageText = "\(kAppName) \(kVersion)"
-        alert.informativeText = """
-        菜单栏输入法切换工具，用于替代失灵的系统 Fn / 🌐 键。
-
-        · 点菜单栏图标可直接选择任意输入法
-        · 快捷键 \(kHotkeyPresets[hotkeyIndex].title) 按系统列表顺序轮换到下一个输入法，转一圈回到起点
-        · 全部使用 macOS 公开 API，无需辅助功能 / 输入监控权限
-
-        如果快捷键与别的程序冲突，可在「快捷键」菜单里更换。
-        """
-        alert.addButton(withTitle: "好")
+        alert.informativeText = L("about.body", kHotkeyPresets[hotkeyIndex].title)
+        alert.addButton(withTitle: L("alert.ok"))
         NSApp.activate(ignoringOtherApps: true)
         alert.runModal()
     }

@@ -1,0 +1,26 @@
+/* SwitchIME — English */
+
+"app.name" = "SwitchIME";
+
+"menu.current" = "Current: %@";
+"menu.next" = "Next Input Source";
+"menu.prev" = "Previous Input Source";
+"menu.all" = "All Input Sources";
+"menu.hotkey" = "Shortcut";
+"menu.login" = "Launch at Login";
+"menu.about" = "About %@";
+"menu.quit" = "Quit";
+"menu.unknown" = "Unknown";
+"menu.next.tip" = "Cycle forward — shortcut %@";
+
+"status.tooltip" = "Current input source: %@\nClick to pick one, or use the shortcut";
+
+"about.body" = "A menu bar input source switcher, built to replace the flaky Fn / 🌐 key.\n\n• Click the menu bar icon to pick any input source\n• %@ cycles to the next one in system order and wraps around\n• Uses only public macOS APIs — no Accessibility or Input Monitoring permission\n\nIf the shortcut conflicts with another app, change it under “Shortcut”.";
+
+"alert.hotkey.title" = "Could not register %@";
+"alert.hotkey.body" = "Another app may already be using this combination. Pick a different one under “Shortcut” in the menu.";
+
+"alert.secure.title" = "Secure keyboard input is active";
+"alert.secure.body" = "While a password field has secure input enabled, macOS blocks every input source change — the Fn key included. Click outside the password field and try again.";
+
+"alert.ok" = "OK";

@@ -34,6 +34,11 @@ fi
 cp Info.plist "$APP/Contents/Info.plist"
 [ -f Resources/AppIcon.icns ] && cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
+# 本地化资源（en.lproj / zh-Hans.lproj）
+for lproj in Resources/*.lproj; do
+    [ -d "$lproj" ] && cp -R "$lproj" "$APP/Contents/Resources/"
+done
+
 echo "==> 签名（ad-hoc）"
 codesign --force --sign - --timestamp=none "$APP" 2>/dev/null || echo "    ad-hoc 签名失败，不影响本机运行"
 

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>zh_CN</string>
+	<string>en</string>
 	<key>CFBundleExecutable</key>
 	<string>SwitchIME</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,12 @@
 	<key>CFBundleName</key>
 	<string>SwitchIME</string>
 	<key>CFBundleDisplayName</key>
-	<string>输入法轮换</string>
+	<string>SwitchIME</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>zh-Hans</string>
+	</array>
 	<key>CFBundleIconFile</key>
 	<string>AppIcon</string>
 	<key>CFBundlePackageType</key>

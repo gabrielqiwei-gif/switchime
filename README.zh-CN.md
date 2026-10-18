@@ -23,6 +23,7 @@ English: [README.md](README.md)
 - 点图标可直接跳转到任意输入法，当前项打勾
 - 「上一个输入法」用于按过头时退回
 - 「登录时自动启动」自己写 LaunchAgent，不依赖额外的 helper
+- **中英文界面**，跟随系统语言自动切换
 - **增删输入法即时生效**：不用重启 App，下次按键就重新读一遍列表
 - **标签自动去重**：同时启用「简体拼音」和「双拼」时，图标显示 `简体` / `双拼` 而不是两个 `拼`
 
@@ -48,6 +49,8 @@ App 只做了 ad-hoc 签名（这个项目没有买 Apple 开发者证书），�
 | 菜单「快捷键」 | 换成 `⌃⇧\`` / `⌃⇧Space` / `⌃Space` / `⌃1` |
 | 菜单「登录时自动启动」 | 写入/删除 `~/Library/LaunchAgents/com.weiqi.switchime.plist` |
 | 菜单「退出」 | 退出 |
+
+界面语言跟随系统：系统是中文就显示中文，是英文就显示英文（输入法名字由 macOS 提供，也会跟着变）。
 
 快捷键默认全是 Control 组合，避开 Option 被大量 App 占用的坑。
 另外默认的 `⌃\`` 在 VS Code（切换终端）和 JetBrains（切换配色）里有同款绑定，
@@ -121,6 +124,18 @@ swiftc -swift-version 5 Sources/InputSources.swift Tests/dynamic/main.swift \
 动态测试覆盖：轮换下标的边界情况（空列表 / 单项 / 回绕 / 当前项不在列表）、标签去重、
 连续 200 次读取当前输入法、添加输入法后能切换并继续轮换、删除输入法后列表与当前状态自洽、
 切到不存在的 id 安全失败、结束时恢复现场。
+
+## 多语言
+
+界面文案在 `Resources/<语言>.lproj/Localizable.strings`。要加一门语言：把 `Resources/en.lproj`
+复制成 `Resources/<语言>.lproj`，翻译里面的值（`InfoPlist.strings` 是 App 显示名），
+再把语言代码加进 `Info.plist` 的 `CFBundleLocalizations` 即可。
+
+不用改系统语言就能验证某门语言：
+
+```bash
+./SwitchIME.app/Contents/MacOS/SwitchIME -AppleLanguages '(ja)' --self-test --log ./st.log
+```
 
 ## 已知限制
 

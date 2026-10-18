@@ -1,0 +1,26 @@
+/* SwitchIME — 简体中文 */
+
+"app.name" = "输入法轮换";
+
+"menu.current" = "当前：%@";
+"menu.next" = "下一个输入法";
+"menu.prev" = "上一个输入法";
+"menu.all" = "所有输入法";
+"menu.hotkey" = "快捷键";
+"menu.login" = "登录时自动启动";
+"menu.about" = "关于 %@";
+"menu.quit" = "退出";
+"menu.unknown" = "未知";
+"menu.next.tip" = "顺序轮换，快捷键 %@";
+
+"status.tooltip" = "当前输入法：%@\n点击选择 / 快捷键切换";
+
+"about.body" = "菜单栏输入法切换工具，用于替代失灵的系统 Fn / 🌐 键。\n\n· 点菜单栏图标可直接选择任意输入法\n· 快捷键 %@ 按系统列表顺序轮换到下一个输入法，转一圈回到起点\n· 全部使用 macOS 公开 API，无需辅助功能 / 输入监控权限\n\n如果快捷键与别的程序冲突，可在「快捷键」菜单里更换。";
+
+"alert.hotkey.title" = "快捷键 %@ 注册失败";
+"alert.hotkey.body" = "可能已被其他程序占用。请在菜单栏图标的「快捷键」里换一个组合。";
+
+"alert.secure.title" = "当前有程序启用了「安全键盘输入」";
+"alert.secure.body" = "密码框等安全输入状态下，macOS 会屏蔽所有输入法切换（系统的 Fn 键也同样无效）。点开密码框后重试即可。";
+
+"alert.ok" = "好";

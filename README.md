@@ -39,6 +39,7 @@ no Accessibility or Input Monitoring permission. You can read all of it in one s
 - **Click the icon** to jump straight to any input source
 - **Previous input source** menu item, for when you overshoot
 - **Login item** toggle — it writes the LaunchAgent itself, no helper app
+- **English / 简体中文 UI** that follows your system language
 - **Follows your input source list live**: add or remove a language in System Settings and it is
   picked up on the next key press, no restart
 - **Label disambiguation**: enable both 简体拼音 and 双拼 and the icon shows `简体` / `双拼`
@@ -67,8 +68,8 @@ macOS warns on first launch. Use any of:
 | Menu → 登录时自动启动 | Add / remove the LaunchAgent |
 | Menu → 退出 | Quit |
 
-The menu is currently Chinese-only (`zh_CN` is the development region). The hotkey, the cycling
-and the login item work regardless of language.
+The UI follows your system language (English and Simplified Chinese are bundled; the input source
+names come from macOS and are localized too).
 
 ## Notes on the Text Input Sources API
 
@@ -135,6 +136,19 @@ Dynamic add/remove test — temporarily enables and disables a keyboard layout, 
 ```bash
 swiftc -swift-version 5 Sources/InputSources.swift Tests/dynamic/main.swift \
        -o /tmp/dynamic -framework Cocoa -framework Carbon && /tmp/dynamic
+```
+
+## Translations
+
+UI strings live in `Resources/<lang>.lproj/Localizable.strings`. To add a language: copy
+`Resources/en.lproj` to `Resources/<your-lang>.lproj`, translate the values (and
+`InfoPlist.strings` for the display name), then add the language to `CFBundleLocalizations` in
+`Info.plist`. Pull requests welcome.
+
+Test a language without changing your system settings:
+
+```bash
+./SwitchIME.app/Contents/MacOS/SwitchIME -AppleLanguages '(ja)' --self-test --log ./st.log
 ```
 
 ## Limitations
