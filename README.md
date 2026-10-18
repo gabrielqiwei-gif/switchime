@@ -12,6 +12,10 @@
   <a href="README.zh-CN.md">中文说明</a> · MIT · macOS 12+ · universal binary · no network
 </p>
 
+<p align="center">
+  <img src="docs/menu-en.png" width="300" alt="SwitchIME menu">
+</p>
+
 ---
 
 ## Why

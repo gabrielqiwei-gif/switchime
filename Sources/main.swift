@@ -17,7 +17,7 @@ func L(_ key: String, _ args: CVarArg...) -> String {
 }
 
 var kAppName: String { L("app.name") }
-let kVersion = "1.2"
+let kVersion = "1.3"
 let kLoginLabel = "com.weiqi.switchime"
 let kDefaultHotkey = 0
 let kPresetSchemaVersion = 2   // 1.1 起快捷键全部改为 Control 组合
@@ -314,9 +314,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
             RunLoop.main.add(closer, forMode: .common)
 
-            self.menu.popUp(positioning: nil,
-                            at: NSPoint(x: 0, y: button.bounds.height + 6),
-                            in: button)
+            NSLog("SwitchIME: screenshot menu opening (button=\(button.frame))")
+            NSApp.activate(ignoringOtherApps: true)
+            button.performClick(nil)      // 等同用户点击状态栏图标，会阻塞到菜单关闭
+            NSLog("SwitchIME: screenshot menu closed")
             NSApp.terminate(nil)
         }
     }

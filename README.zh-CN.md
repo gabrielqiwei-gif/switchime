@@ -16,6 +16,10 @@ SwitchIME 直接调用 Text Input Sources API（`TISSelectInputSource`），完�
 
 English: [README.md](README.md)
 
+<p align="center">
+  <img src="docs/menu-zh.png" width="300" alt="SwitchIME 菜单">
+</p>
+
 ## 功能
 
 - 菜单栏常驻图标，显示当前输入法短名（`拼` `微` `美` `あ` `US` …）
