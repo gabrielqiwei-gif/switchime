@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/icon-zh.png" width="140" alt="SwitchIME 图标">
+</p>
+
 # 输入法轮换（SwitchIME）
 
 一个 macOS 菜单栏小工具，用来替代系统那个经常失灵的 **Fn / 🌐 键切换输入法**。
@@ -27,7 +31,7 @@ English: [README.md](README.md)
 - 点图标可直接跳转到任意输入法，当前项打勾
 - 「上一个输入法」用于按过头时退回
 - 「登录时自动启动」自己写 LaunchAgent，不依赖额外的 helper
-- **中英文界面**，跟随系统语言自动切换
+- **中英文界面**，跟随系统语言自动切换，**连 App 图标都会跟着变**（英文 `A` / 中文 `文`）
 - **增删输入法即时生效**：不用重启 App，下次按键就重新读一遍列表
 - **标签自动去重**：同时启用「简体拼音」和「双拼」时，图标显示 `简体` / `双拼` 而不是两个 `拼`
 
@@ -132,8 +136,11 @@ swiftc -swift-version 5 Sources/InputSources.swift Tests/dynamic/main.swift \
 ## 多语言
 
 界面文案在 `Resources/<语言>.lproj/Localizable.strings`。要加一门语言：把 `Resources/en.lproj`
-复制成 `Resources/<语言>.lproj`，翻译里面的值（`InfoPlist.strings` 是 App 显示名），
+复制成 `Resources/<语言>.lproj`，翻译里面的值（`InfoPlist.strings` 里是 App 显示名和图标文件名），
 再把语言代码加进 `Info.plist` 的 `CFBundleLocalizations` 即可。
+
+每门语言还可以有自己的图标：加一个 `Resources/AppIcon-<语言>.icns`，然后在该语言的
+`InfoPlist.strings` 里把 `CFBundleIconFile` 指过去。
 
 不用改系统语言就能验证某门语言：
 

@@ -32,7 +32,7 @@ else
 fi
 
 cp Info.plist "$APP/Contents/Info.plist"
-[ -f Resources/AppIcon.icns ] && cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
+cp Resources/*.icns "$APP/Contents/Resources/"
 
 # 本地化资源（en.lproj / zh-Hans.lproj）
 for lproj in Resources/*.lproj; do

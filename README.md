@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="Resources/icon-1024.png" width="140" alt="SwitchIME icon">
+  <img src="docs/icon-en.png" width="140" alt="SwitchIME icon">
 </p>
 
 <h1 align="center">SwitchIME</h1>
@@ -43,7 +43,8 @@ no Accessibility or Input Monitoring permission. You can read all of it in one s
 - **Click the icon** to jump straight to any input source
 - **Previous input source** menu item, for when you overshoot
 - **Login item** toggle — it writes the LaunchAgent itself, no helper app
-- **English / 简体中文 UI** that follows your system language
+- **English / 简体中文 UI** that follows your system language, down to the app icon
+  (`A` for English, `文` for Chinese)
 - **Follows your input source list live**: add or remove a language in System Settings and it is
   picked up on the next key press, no restart
 - **Label disambiguation**: enable both 简体拼音 and 双拼 and the icon shows `简体` / `双拼`
@@ -146,8 +147,11 @@ swiftc -swift-version 5 Sources/InputSources.swift Tests/dynamic/main.swift \
 
 UI strings live in `Resources/<lang>.lproj/Localizable.strings`. To add a language: copy
 `Resources/en.lproj` to `Resources/<your-lang>.lproj`, translate the values (and
-`InfoPlist.strings` for the display name), then add the language to `CFBundleLocalizations` in
-`Info.plist`. Pull requests welcome.
+`InfoPlist.strings` for the display name and icon file), then add the language to
+`CFBundleLocalizations` in `Info.plist`. Pull requests welcome.
+
+Each language can also ship its own app icon: add `Resources/AppIcon-<lang>.icns` and point
+`CFBundleIconFile` in that language's `InfoPlist.strings` at it.
 
 Test a language without changing your system settings:
 

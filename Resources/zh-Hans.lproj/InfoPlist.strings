@@ -1,2 +1,3 @@
 "CFBundleName" = "SwitchIME";
 "CFBundleDisplayName" = "输入法轮换";
+"CFBundleIconFile" = "AppIcon-zh";

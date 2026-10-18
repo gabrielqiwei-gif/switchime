@@ -17,7 +17,7 @@ func L(_ key: String, _ args: CVarArg...) -> String {
 }
 
 var kAppName: String { L("app.name") }
-let kVersion = "1.3"
+let kVersion = "1.4"
 let kLoginLabel = "com.weiqi.switchime"
 let kDefaultHotkey = 0
 let kPresetSchemaVersion = 2   // 1.1 起快捷键全部改为 Control 组合
@@ -339,6 +339,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         } else {
             log("statusItem: FAILED (no button/window)")
         }
+        log("icon: \(Bundle.main.object(forInfoDictionaryKey: "CFBundleIconFile") as? String ?? "nil")")
         log("activationPolicy: \(NSApp.activationPolicy() == .accessory ? "accessory (无 Dock 图标)" : "其他")")
 
         let startID = TIS.current()?.id
