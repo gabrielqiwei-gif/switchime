@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build universal app
+        run: ./build.sh
+
+      - name: Verify architectures
+        run: |
+          archs=$(lipo -archs SwitchIME.app/Contents/MacOS/SwitchIME)
+          echo "archs: $archs"
+          echo "$archs" | grep -q arm64
+          echo "$archs" | grep -q x86_64
+
+      - name: Run logic tests
+        run: |
+          swiftc -swift-version 5 Sources/InputSources.swift Tests/logic/main.swift \
+                 -o /tmp/logic -framework Carbon
+          /tmp/logic

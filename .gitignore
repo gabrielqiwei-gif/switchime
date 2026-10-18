@@ -1,0 +1,15 @@
+# 构建产物
+.build/
+*.app/
+*.zip
+
+# 测试输出
+self-test.log
+*.log
+
+# macOS
+.DS_Store
+
+# Xcode / SwiftPM（如果以后改用工程文件）
+*.xcuserstate
+.swiftpm/
