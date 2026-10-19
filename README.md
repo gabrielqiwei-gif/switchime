@@ -159,6 +159,20 @@ Test a language without changing your system settings:
 ./SwitchIME.app/Contents/MacOS/SwitchIME -AppleLanguages '(ja)' --self-test --log ./st.log
 ```
 
+## Troubleshooting: switched, but still typing the old layout
+
+Very occasionally macOS updates the *selected* input source (the menu bar label changes) while the
+app you are typing in keeps its old input context — the keystrokes keep going to the previous
+layout. Third-party IMEs (WeChat, Sogou, …) are the usual suspects, and the system input menu may
+show a greyed-out placeholder for the IME while it happens.
+
+SwitchIME does two things about it:
+
+- after every switch it re-selects the same source once, ~120 ms later, which nudges macOS into
+  rebinding the context (skipped if you switched again in the meantime)
+- the menu has **Re-activate Input Source**, which hops to another source and back, forcing a
+  proper rebind when the automatic nudge was not enough
+
 ## Limitations
 
 - Sequential cycling only; no per-app memory (use InputSourcePro for that)

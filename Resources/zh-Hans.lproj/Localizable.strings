@@ -24,3 +24,6 @@
 "alert.secure.body" = "密码框等安全输入状态下，macOS 会屏蔽所有输入法切换（系统的 Fn 键也同样无效）。点开密码框后重试即可。";
 
 "alert.ok" = "好";
+
+"menu.reactivate" = "重新激活输入法";
+"menu.reactivate.tip" = "输入源已经切过去、打字却还是上一个布局时，用它强制系统重新绑定。";

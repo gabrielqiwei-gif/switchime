@@ -17,7 +17,7 @@ func L(_ key: String, _ args: CVarArg...) -> String {
 }
 
 var kAppName: String { L("app.name") }
-let kVersion = "1.4"
+let kVersion = "1.4.1"
 let kLoginLabel = "com.weiqi.switchime"
 let kDefaultHotkey = 0
 let kPresetSchemaVersion = 2   // 1.1 起快捷键全部改为 Control 组合
@@ -148,6 +148,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var current: InputSourceInfo?
     private var lastSeenID: String?
     private var pollTimer: Timer?
+    private var reassertWork: DispatchWorkItem?
     private var cycleAnchor: String?   // 上一次成功切换到的输入法，当前输入法不在列表里时兜底
     private var hotkeyRegistered = false
     private let selfTestMode = CommandLine.arguments.contains("--self-test")
@@ -253,6 +254,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             current = now
         }
         updateTitle()
+        scheduleReassert(id)
+    }
+
+    /// 再选一次同一个输入源。
+    ///
+    /// 第三方 IME（微信输入法、搜狗等）偶发「全局输入源已经切过去、但当前 App 的输入上下文
+    /// 还停在旧输入源」——表现就是图标显示「微」却仍在打英文，手动在系统菜单里重选一次才好。
+    /// 这里在切换后补一次相同选择，强制系统重建输入上下文；期间若用户又切了别的输入源就放弃，
+    /// 以免把后一次切换覆盖掉。
+    private func scheduleReassert(_ id: String) {
+        reassertWork?.cancel()
+        let work = DispatchWorkItem { [weak self] in
+            guard self != nil else { return }
+            guard TIS.current()?.id == id else { return }
+            _ = TIS.select(id: id)
+        }
+        reassertWork = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12, execute: work)
+    }
+
+    /// 手动恢复：先切到另一个输入源再切回来，强制重建输入上下文
+    private func reactivateCurrent() {
+        refreshSources()
+        guard sources.count > 1 else { return }
+        let nowID = TIS.current()?.id ?? lastSeenID
+        guard let nowID = nowID,
+              let detour = sources.first(where: { $0.id != nowID }) else { return }
+
+        _ = TIS.select(id: detour.id)
+        usleep(60_000)
+        switchTo(nowID)
     }
 
     /// 按系统输入法菜单里的顺序轮换到下一个 / 上一个，到底后回到第一个
@@ -363,6 +395,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         for i in 1..<chain.count where chain[i] == chain[i - 1] { allChanged = false }
         log("每一步都换成新输入法: \(allChanged ? "OK" : "FAIL")")
 
+        let beforeReactivate = TIS.current()?.id
+        reactivateCurrent(); settle()
+        let afterReactivate = TIS.current()?.id
+        log("重新激活 -> \(afterReactivate ?? "nil") : \(afterReactivate == beforeReactivate ? "OK 回到原输入法" : "FAIL 停在别处")")
+
         cycle(direction: -1); settle()
         let backID = TIS.current()?.id
         log("逆序一步 -> \(sources.first(where: { $0.id == backID })?.name ?? "nil") : \(backID != startID ? "OK changed" : "FAIL unchanged")")
@@ -420,6 +457,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         prevItem.target = self
         menu.addItem(prevItem)
 
+        let reactivate = NSMenuItem(title: L("menu.reactivate"), action: #selector(reactivateAction), keyEquivalent: "")
+        reactivate.target = self
+        reactivate.toolTip = L("menu.reactivate.tip")
+        menu.addItem(reactivate)
+
         menu.addItem(.separator())
 
         let listHeader = NSMenuItem(title: L("menu.all"), action: nil, keyEquivalent: "")
@@ -469,6 +511,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func nextAction() { cycle(direction: 1) }
 
     @objc private func prevAction() { cycle(direction: -1) }
+
+    @objc private func reactivateAction() { reactivateCurrent() }
 
     @objc private func selectSourceAction(_ sender: NSMenuItem) {
         guard let id = sender.representedObject as? String else { return }

@@ -24,3 +24,6 @@
 "alert.secure.body" = "While a password field has secure input enabled, macOS blocks every input source change — the Fn key included. Click outside the password field and try again.";
 
 "alert.ok" = "OK";
+
+"menu.reactivate" = "Re-activate Input Source";
+"menu.reactivate.tip" = "If the input source changed but typing still goes to the previous layout, use this to force the system to rebind it.";

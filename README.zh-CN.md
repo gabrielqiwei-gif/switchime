@@ -148,6 +148,18 @@ swiftc -swift-version 5 Sources/InputSources.swift Tests/dynamic/main.swift \
 ./SwitchIME.app/Contents/MacOS/SwitchIME -AppleLanguages '(ja)' --self-test --log ./st.log
 ```
 
+## 故障排查：切过去了，但还是在打旧布局
+
+极少数情况下，macOS 已经切换了**选中的输入源**（菜单栏标签都变了），但你正在打字的 App 还
+持有旧的输入上下文，按键继续走上一个布局。第三方输入法（微信、搜狗等）比较容易出现，
+此时系统输入法菜单里那个 IME 的详情区会显示灰色的占位符。
+
+SwitchIME 对此做了两件事：
+
+- 每次切换后约 120ms 再选一次同一个输入源，催促 macOS 重建上下文（期间你又切了别的就跳过，
+  不会把后一次切换覆盖掉）
+- 菜单里提供**重新激活输入法**：先跳到另一个输入源再切回来，强制重新绑定。自动补救没生效时用它
+
 ## 已知限制
 
 - 只做顺序轮换，不按 App 记忆输入法（要这个请用 InputSourcePro）
